@@ -463,6 +463,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlacementManager
   _mainCamera: {fileID: 2067072999}
+  _environment: {fileID: 1117593541}
   _environmentLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -1405,8 +1406,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 280, y: 0}
+  m_AnchoredPosition: {x: 0, y: 234.5}
+  m_SizeDelta: {x: 280, y: -469}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &1634393371
 MonoBehaviour:
@@ -2100,8 +2101,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2067072997}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.15693341, y: 0.36567461, z: -0.06269896, w: -0.915272}
-  m_LocalPosition: {x: 53.157524, y: 17.77105, z: -2.410406}
+  m_LocalRotation: {x: 0.29633442, y: -0.5115179, z: 0.19359477, w: 0.78297925}
+  m_LocalPosition: {x: 67.916725, y: 38.49736, z: 6.7829227}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

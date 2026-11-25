@@ -32,7 +32,7 @@ public class PropDragItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
         _placementManager.BeginDrag(_propPrefab, eventData.position);
 
-        _placementManager.UpdateDrag(eventData.position);
+        _placementManager.UpdateDrag(eventData.position, eventData.pointerId);
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -40,7 +40,7 @@ public class PropDragItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         if (_placementManager == null)
             return;
 
-        _placementManager.UpdateDrag(eventData.position);
+        _placementManager.UpdateDrag(eventData.position, eventData.pointerId);
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -49,7 +49,7 @@ public class PropDragItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
             return;
 
         // 更新最後一次滑鼠位置
-        _placementManager.UpdateDrag(eventData.position);
+        _placementManager.UpdateDrag(eventData.position, eventData.pointerId);
 
 
         // 放開滑鼠時若位於 UI 上，取消放置

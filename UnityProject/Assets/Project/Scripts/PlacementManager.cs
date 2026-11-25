@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// 負責場景物件的拖曳放置管理。
@@ -12,6 +13,7 @@ public class PlacementManager : MonoBehaviour
     [SerializeField] private Camera _mainCamera;
 
     [Header("Terrain")]
+    [SerializeField] private GameObject _environment;
     [SerializeField] private LayerMask _environmentLayer;
 
     [Header("Guide Line")]
@@ -51,6 +53,9 @@ public class PlacementManager : MonoBehaviour
     private void Start()
     {
         if (_guideLine == null)
+            Debug.LogError("_guideLine is missing.");
+
+        if(_environment == null)
             Debug.LogError("_guideLine is missing.");
     }
 
@@ -95,7 +100,7 @@ public class PlacementManager : MonoBehaviour
 
     }
 
-    public void UpdateDrag(Vector2 screenPosition)
+    public void UpdateDrag(Vector2 screenPosition,int pointerID)
     {
         if (!_isDragging || _previewObject == null)
             return;
@@ -112,8 +117,12 @@ public class PlacementManager : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit, 500f, _environmentLayer))
         {
             _guideLine.SetPosition(1, hit.point);
-            Debug.Log(hit.transform.name);
-            _guideLine.enabled = true;
+
+            //滑鼠若位於 UI 上，取消放置
+            if (!EventSystem.current.IsPointerOverGameObject(pointerID))
+                _guideLine.enabled = true;
+            else
+                _guideLine.enabled = false;
 
             if (hit.transform.CompareTag("Terrain"))
             {
@@ -137,7 +146,6 @@ public class PlacementManager : MonoBehaviour
         {
             _hasValidPosition = false;
 
-
             // 沒有有效落點時隱藏指引線
             _guideLine.enabled = false;
         }
@@ -153,6 +161,8 @@ public class PlacementManager : MonoBehaviour
             GameObject placedObject = Instantiate(_currentPrefab);
 
             AlignObjectToGround(placedObject, _currentPlacementPosition, _currentPlacementNormal);
+
+            placedObject.transform.SetParent(_environment.transform, true);
         }
 
         CancelDrag();
