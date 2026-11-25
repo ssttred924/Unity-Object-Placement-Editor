@@ -14,7 +14,7 @@ public class PlacementManager : MonoBehaviour
 
     [Header("Terrain")]
     [SerializeField] private GameObject _environment;
-    [SerializeField] private LayerMask _environmentLayer;
+    [SerializeField] private LayerMask _hittableLayer;
 
     [Header("Guide Line")]
     [SerializeField] private LineRenderer _guideLine;
@@ -91,6 +91,9 @@ public class PlacementManager : MonoBehaviour
 
         _previewObject = Instantiate(prefab, _previewWorldPosition,Quaternion.identity);
 
+        foreach (Collider collider in _previewObject.GetComponentsInChildren<Collider>(true))
+            collider.enabled = false;
+
         _isDragging = true;
         _hasValidPosition = false;
 
@@ -114,7 +117,7 @@ public class PlacementManager : MonoBehaviour
         // 從滑鼠位置向場景發射射線
         Ray ray = _mainCamera.ScreenPointToRay(screenPosition);
 
-        if (Physics.Raycast(ray, out RaycastHit hit, 500f, _environmentLayer))
+        if (Physics.Raycast(ray, out RaycastHit hit, 500f, _hittableLayer))
         {
             _guideLine.SetPosition(1, hit.point);
 
