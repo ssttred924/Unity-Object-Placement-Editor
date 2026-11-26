@@ -24,6 +24,9 @@ public class PropDragItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (eventData.button != PointerEventData.InputButton.Left)
+            return;
+
         if (_placementManager == null || _propPrefab == null)
         {
             Debug.LogWarning("PlacementManager or Prefab is missing.");
@@ -37,6 +40,9 @@ public class PropDragItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (eventData.button != PointerEventData.InputButton.Left)
+            return;
+
         if (_placementManager == null)
             return;
 
@@ -45,6 +51,9 @@ public class PropDragItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (eventData.button != PointerEventData.InputButton.Left)
+            return;
+
         if (_placementManager == null)
             return;
 
