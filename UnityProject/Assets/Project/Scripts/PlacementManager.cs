@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// 負責場景物件的拖曳放置管理。
@@ -23,6 +24,9 @@ public class PlacementManager : MonoBehaviour
     [SerializeField] private float _previewDistance = 5f;
     [SerializeField] private Vector2 previewOffset = new Vector2(-100f, 100f);
     [SerializeField] private float _previewObjMoveSpeed = 100f;
+
+    [Header("XR Preview")]
+    [SerializeField] private Transform _xrPreviewAnchor;
 
     private GameObject _previewObject;
     private GameObject _currentPrefab;
@@ -61,14 +65,13 @@ public class PlacementManager : MonoBehaviour
 
     private void Update()
     {
-        if (_previewObject != null)
-        {
-            // 預覽物件跟隨滑鼠
-            _previewObject.transform.position =
-                Vector3.Lerp(_previewObject.transform.position, _previewWorldPosition, _previewObjMoveSpeed * Time.deltaTime);
+        if (_previewObject == null)
+            return;
 
-            _guideLine.SetPosition(0, _previewObject.transform.position);
-        }
+        _previewObject.transform.position =
+            Vector3.Lerp(_previewObject.transform.position, _previewWorldPosition, _previewObjMoveSpeed * Time.deltaTime);
+
+        _guideLine.SetPosition(0, _previewObject.transform.position);
     }
 
     public void BeginDrag(GameObject prefab, Vector2 screenPosition)
@@ -202,5 +205,87 @@ public class PlacementManager : MonoBehaviour
 
         _isDragging = false;
         _hasValidPosition = false;
+    }
+
+    /// <summary>
+    /// 更新 VR 模式下預覽物件的位置。
+    /// </summary>
+    public void UpdateXRPreviewPosition()
+    {
+        if (_xrPreviewAnchor == null || _previewObject == null)
+            return;
+
+        _previewWorldPosition = _xrPreviewAnchor.position;
+    }
+
+    /// <summary>
+    /// 開始 VR 模式下的道具拖曳。
+    /// </summary>
+    public void BeginXRDrag(GameObject prefab)
+    {
+        if (prefab == null || _xrPreviewAnchor == null)
+        {
+            Debug.LogWarning("Prefab or XR Preview Anchor is missing.");
+            return;
+        }
+
+        CancelDrag();
+
+        _currentPrefab = prefab;
+
+        _previewWorldPosition = _xrPreviewAnchor.position;
+        _previewObject = Instantiate(prefab, _previewWorldPosition, Quaternion.identity);
+
+        foreach (Collider collider in _previewObject.GetComponentsInChildren<Collider>(true))
+            collider.enabled = false;
+
+        _isDragging = true;
+        _hasValidPosition = false;
+
+        _guideLine.SetPosition(0, _previewObject.transform.position);
+        _guideLine.SetPosition(1, _previewObject.transform.position);
+
+        _guideLine.startColor = Color.red;
+        _guideLine.endColor = Color.red;
+
+        _guideLine.enabled = true;
+    }
+
+    /// <summary>
+    /// 使用 VR 控制器射線偵測地形，更新道具落點與指引線。
+    /// </summary>
+    public void UpdateXRDrag(Ray ray, bool IsGetUIRaycast)
+    {
+        if (!_isDragging || _previewObject == null)
+            return;
+
+        if (Physics.Raycast(ray, out RaycastHit hit, 500f, _hittableLayer))
+        {
+            _guideLine.enabled = true;
+            _guideLine.SetPosition(1, hit.point);
+
+            if (hit.transform.CompareTag("Terrain") && !IsGetUIRaycast)
+            {
+                _currentPlacementPosition = hit.point;
+                _currentPlacementNormal = hit.normal;
+
+                _hasValidPosition = true;
+
+                _guideLine.startColor = Color.green;
+                _guideLine.endColor = Color.green;
+            }
+            else
+            {
+                _hasValidPosition = false;
+
+                _guideLine.startColor = Color.red;
+                _guideLine.endColor = Color.red;
+            }
+        }
+        else
+        {
+            _hasValidPosition = false;
+            _guideLine.enabled = false;
+        }
     }
 }

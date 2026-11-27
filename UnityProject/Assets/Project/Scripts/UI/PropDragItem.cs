@@ -12,26 +12,28 @@ using UnityEngine.EventSystems;
 public class PropDragItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [Header("References")]
-    
+
     [SerializeField] private GameObject _propPrefab;
 
     private PlacementManager _placementManager;
+    private DeviceModeManager _deviceModeManager;
 
     private void Start()
     {
         _placementManager = PlacementManager.Instance;
+        _deviceModeManager = DeviceModeManager.Instance;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (eventData.button != PointerEventData.InputButton.Left)
-            return;
-
-        if (_placementManager == null || _propPrefab == null)
+        if (_placementManager == null || _deviceModeManager == null || _propPrefab == null)
         {
-            Debug.LogWarning("PlacementManager or Prefab is missing.");
+            Debug.LogWarning("PlacementManager or DeviceModeManager or Prefab is missing.");
             return;
         }
+
+        if (eventData.button != PointerEventData.InputButton.Left || _deviceModeManager.IsXRMode)
+            return;
 
         _placementManager.BeginDrag(_propPrefab, eventData.position);
 
@@ -40,21 +42,27 @@ public class PropDragItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (eventData.button != PointerEventData.InputButton.Left)
+        if (_placementManager == null || _deviceModeManager == null)
+        {
+            Debug.LogWarning("PlacementManager or DeviceModeManager is missing.");
             return;
+        }
 
-        if (_placementManager == null)
-            return;
+        if (eventData.button != PointerEventData.InputButton.Left || _deviceModeManager.IsXRMode)
+            return;;
 
         _placementManager.UpdateDrag(eventData.position, eventData.pointerId);
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (eventData.button != PointerEventData.InputButton.Left)
+        if (_placementManager == null || _deviceModeManager == null)
+        {
+            Debug.LogWarning("PlacementManager or DeviceModeManager is missing.");
             return;
+        }
 
-        if (_placementManager == null)
+        if (eventData.button != PointerEventData.InputButton.Left || _deviceModeManager.IsXRMode)
             return;
 
         // 更新最後一次滑鼠位置
@@ -65,5 +73,10 @@ public class PropDragItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         bool pointerOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject(eventData.pointerId);
 
         _placementManager.EndDrag(pointerOverUI);
+    }
+
+    public GameObject GetPrefab()
+    {
+        return _propPrefab;
     }
 }
