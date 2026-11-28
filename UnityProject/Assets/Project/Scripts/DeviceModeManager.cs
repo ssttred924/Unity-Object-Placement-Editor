@@ -40,10 +40,15 @@ public class DeviceModeManager : MonoBehaviour
 
         if (_isXRMode)
         {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
             _xrOrigin.gameObject.SetActive(true);
             _mainCamera.gameObject.SetActive(false);
+
             _inputSystemUIInputModule.enabled = false;
             _xrUIInputModule.enabled = true;
+
             _mainCanvas.gameObject.SetActive(false);
             _VRPropListCanvas.gameObject.SetActive(true);
         }
@@ -51,10 +56,20 @@ public class DeviceModeManager : MonoBehaviour
         {
             _xrOrigin.gameObject.SetActive(false);
             _mainCamera.gameObject.SetActive(true);
+
             _inputSystemUIInputModule.enabled = true;
             _xrUIInputModule.enabled = false;
+
             _mainCanvas.gameObject.SetActive(true);
             _VRPropListCanvas.gameObject.SetActive(false);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
         }
     }
 }
